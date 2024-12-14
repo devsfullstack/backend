@@ -9,3 +9,5 @@ Instrucciones para la instalacion inicial del proyecto
 * Se debe correr el comando 'npm install', el cual instalara todas las dependencias del proyecto.
 * Dentro de backend se debe crear el archivo .env y agregar las variables de entorno correspondientes.
 * El archivo arranque.bat se debe cortar y pegar dentro de la carpeta c:\poceanico, para que todo funcione como se debe.
+* Dentro de XAMMP se debe importar el archivo que esta en c:\poceanico\backend\db\db.sql , este archivo creara la base de datos y las tablas correnpondientes en xammp
+* Correr el archivo arranque.bat que se encuentra dentro de c:\poceanico\ , se debe iniciar el servidor en el puerto configurado en las variables de entorno y la conexion a la base de datos.
