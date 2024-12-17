@@ -1,6 +1,8 @@
-const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
-const db = require('../DB/db'); // Ajusta la ruta según tu estructura de archivos
+const {pool} = require('../db/db.js'); // Ajusta la ruta según tu estructura de archivos
+const db = require('../db/db.js')  
+
+const tabla = 'usuarios'; 
 
 const registerUser = async () => {
     const nombre = 'Admin';
@@ -15,19 +17,15 @@ const registerUser = async () => {
     const hashedPassword = await bcrypt.hash(contraseña, 10);
     const fechaCreacion = new Date(); // Fecha actual
 
-    console.log('Insertando usuario:', { nombre, apellido, usuario, email, cargo, rol, fecha_creacion: fechaCreacion });
+    console.log('Insertando usuario:', { nombre, apellido, usuario, email, cargo, rol, fecha_creacion: fechaCreacion }); 
 
-    try {
-        const insertQuery = `
-            INSERT INTO usuarios (nombre, apellido, usuario, contraseña, email, cargo, rol, fecha_creacion) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-        await db.query(insertQuery, [nombre, apellido, usuario, hashedPassword, email, cargo, rol, fechaCreacion]);
-        console.log('Usuario registrado exitosamente.');
-    } catch (err) {
-        console.error('Error al registrar el usuario:', err.message);
+    const sql = (`INSERT INTO ${tabla} (nombre, apellido, usuario, contraseña, email, cargo, rol) VALUES ("${nombre}", "${apellido}", "${usuario}", "${hashedPassword}", "${email}", "${cargo}", "${rol}")`)
+    db.query(sql, (err, results) => {
+        if (err) { return res.status(500).send(`Error creando registro en tabla: ${tabla}`) }
+            
+        res.json(results)});
+
     }
-};
-
 // Llama a la función para registrar al usuario
 registerUser();

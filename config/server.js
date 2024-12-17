@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const db = require('../DB/db'); // Importar la conexión a la base de datos
 const routes = require("../routes/routes");
 const app = express();
 const config = require('../config/config')

@@ -1,9 +1,7 @@
-const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const db = require('../DB/db'); // Asegúrate de que esta ruta sea correcta
-const { jwtSecret, jwtExpiresIn } = require('../config/jwtConfig');
-require('dotenv').config(); // Cargar variables de entorno
+const db = require('../db/db'); // Asegúrate de que esta ruta sea correcta
+const config = require('../config/config')
 
 // Función para registrar un nuevo usuario
 const register = async (req, res) => {
@@ -66,7 +64,7 @@ const login = async (req, res) => {
         }
 
         // Generar un token JWT que incluya el rol
-        const token = jwt.sign({ id: user.id, rol: user.rol }, jwtSecret, { expiresIn: jwtExpiresIn });
+        const token = jwt.sign({ id: user.id, rol: user.rol }, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN });
         res.status(200).json({ message: 'Inicio de sesión exitoso.', token });
     } catch (err) {
         console.error('Error al buscar el usuario:', err.message);
@@ -82,7 +80,7 @@ const verifyToken = (req, res, next) => {
         return res.status(403).json({ error: 'Se requiere un token.' });
     }
 
-    jwt.verify(token, jwtSecret, (err, decoded) => {
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
         if (err) {
             return res.status(401).json({ error: 'Token inválido.' });
         }

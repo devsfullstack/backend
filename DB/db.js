@@ -1,9 +1,8 @@
-require('dotenv').config(); // Cargar variables de entorno desde .env
-const mysql = require('mysql2/promise'); // Importar la versión con promesas
+const mysql = require('mysql2'); // Importar la versión con promesas
 const config = require('../config/config')
 
 // Crear una conexión a la base de datos usando un pool para manejar múltiples conexiones
-const pool = async()=>{
+const db = async()=>{
 try {
     await mysql.createConnection({
         host: config.mysql.host,
@@ -16,4 +15,4 @@ try {
     throw new Error('Error al crear la conexión a la base de datos');
 }
 }
-module.exports = pool; // Exportar el pool de conexiones
+module.exports = db; // Exportar el pool de conexiones

@@ -1,5 +1,5 @@
 const server = require('./config/server')
-const pool = require('./DB/db')
+const db = require('./db/db')
 
-pool();
+db();
 server();
