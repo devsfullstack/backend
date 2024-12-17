@@ -1,5 +1,5 @@
 const jwt = require('../config/jwtutils');
-require('dotenv').config(); // Asegúrate de cargar las variables de entorno
+const config = require('../config/config');
 
 const authMiddleware = (req, res, next) => {
     const token = req.headers['authorization'];
@@ -10,7 +10,7 @@ const authMiddleware = (req, res, next) => {
 
     const cleanToken = token.startsWith('Bearer ') ? token.split(' ')[1] : token;
 
-    jwt.verify(cleanToken, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(cleanToken, config.JWT_SECRET, (err, decoded) => {
         if (err) {
             return res.status(401).json({ error: 'Token no válido.' });
         }
