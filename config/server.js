@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const routes = require("../routes/routes");
 const app = express();
 const config = require('../config/config')
 const PORT = config.PORT;
@@ -15,14 +14,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname,'../public')))
 
 
-app.use('/',(req, res)=>{
-    return res.status(200).json({
-        message: 'Servidor funcionando correctamente',
-        status: 200
-        })
-})
 // Define tus rutas
-app.use('/api', routes); // Montar las rutas
+app.use('/api', require('../routes/users'))
+app.use('/api', require('../routes/categorias'))
+app.use('/api', require('../routes/clientes'))
+app.use('/api', require('../routes/comisiones'))
+app.use('/api', require('../routes/cuentas'))
+app.use('/api', require('../routes/egresos'))
+app.use('/api', require('../routes/ingresos'))
+app.use('/api', require('../routes/movimientos'))
+app.use('/api', require('../routes/presupuestos'))
+app.use('/api', require('../routes/productos'))
+app.use('/api', require('../routes/proveedores'))
+
 
 // Middleware para manejo de errores
 app.use((err, req, res, next) => {
