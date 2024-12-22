@@ -1,6 +1,5 @@
 // jwtUtils.js
 const jwt = require('jsonwebtoken');
-const { jwtSecret, jwtExpiresIn } = require('../config/jwtConfig');
 const config = require('../config/config')
 
 const generateToken = (user) => {
@@ -11,7 +10,7 @@ const verifyToken = (token) => {
   try {
     return jwt.verify(token, config.JWT_SECRET);
   } catch (err) {
-    throw new Error('Token verification failed');
+    throw new Error('Fallo la verifiación del token');
   }
 };
 

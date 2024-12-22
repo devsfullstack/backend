@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname,'../public')))
 
 
 // Define tus rutas
+app.use('/api', require('../routes/auth'));
 app.use('/api', require('../routes/users'))
 app.use('/api', require('../routes/categorias'))
 app.use('/api', require('../routes/clientes'))

@@ -31,7 +31,7 @@ const getOne = (req, res) => {
                 return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
                 }
                 if (results.length === 0) {
-                    return res.status(404).send(`El usuario con id ${id} no existe`);
+                    return res.status(404).send(`El usuario con id '${id}' no existe`);
                     }
                     return res.status(200).json({
                         results
@@ -47,7 +47,7 @@ const getOne = (req, res) => {
                 return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
                 }
                 if (results.length === 0) {
-                    return res.status(404).send(`El usuario con user ${user} no existe`);
+                    return res.status(404).send(`El usuario '${user}' no existe`);
                     }
                     return res.status(200).json({
                         results
