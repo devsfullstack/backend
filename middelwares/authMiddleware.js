@@ -15,7 +15,7 @@ const authMiddleware = (req, res, next) => {
             return res.status(401).json({ error: 'Token no válido.' });
         }
         
-        req.userId = decoded.id; // Almacena la información decodificada
+        req.userId = decoded.id_user; // Almacena la información decodificada
         next();
     });
 };
