@@ -74,7 +74,7 @@ const login = (req, res) => {
             
                     // Generar un token JWT que incluya el rol
                     const token = jwt.sign({ 
-                        id: usuario.id, 
+                        id: usuario.id_user, 
                         rol: usuario.rol 
                     }, 
                     config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN });
