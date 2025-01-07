@@ -12,7 +12,7 @@ const db = mysql.createConnection({
         db.connect(
             function(err) { 
                 if (err) {
-                    console.error('Error de conexión enm la base de datos:', err);
+                    console.error('Error de conexión en la base de datos:', err);
                     return;
                     }
                     console.log('Base de datos conectada: '+config.mysql.database+' id ' + db.threadId);
