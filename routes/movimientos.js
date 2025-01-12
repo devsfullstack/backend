@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router()
 const controllers = require('../controllers/movimientos')
-const path = require('path')
 
 router.get('/movimientos', controllers.getAll)
-router.get(path.join('/'+'?:id'), controllers.getOne)
-router.post('/movimientos', controllers.create)
-router.put('/movimientos', controllers.update)
-router.delete('/movimientos', controllers.deleted)
+router.get('/movimiento', controllers.getOne)
+router.post('/movimiento', controllers.create)
+router.put('/movimiento', controllers.update)
+router.delete('/movimiento', controllers.deleted)
 
 module.exports = router;
