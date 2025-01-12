@@ -1,6 +1,6 @@
 const db = require('../db/db')
 
-const tabla = 'ingresos'
+const tabla = 'facturas'
 
 const getAll = (req, res) => {
 
