@@ -109,6 +109,7 @@ const create = (req, res) => {
 
 
     const update = (req, res)=>{
+        
         const {id, categoria, tipo} = req.body;
 
         const sql = (`UPDATE ${tabla} SET categoria = '${categoria}', tipo = '${tipo}' WHERE id_categoria = '${id}'`)

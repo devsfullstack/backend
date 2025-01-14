@@ -22,10 +22,10 @@ const getAll = (req, res) => {
 
 
 const getOne = (req, res) => {
-    const {id, categoria, tipo} = req.body
+    const {id, cliente, nombre} = req.body
     
     if(id > 0){
-        const sql = (`SELECT * FROM ${tabla} WHERE id_categoria = '${id}'`)
+        const sql = (`SELECT * FROM ${tabla} WHERE id_cliente = '${id}'`)
         const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por ID", "${req.user}")`)
     
         db.query(sql, (err, results) => {
@@ -34,7 +34,7 @@ const getOne = (req, res) => {
                 return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
                 }
                 if (results.length === 0) {
-                    return res.status(404).send(`Categoria con id '${id}' no existe`);
+                    return res.status(404).send(`Cliente con id '${id}' no existe`);
                     }
                     db.query(sql2)
                     return res.status(200).json({
@@ -43,10 +43,10 @@ const getOne = (req, res) => {
     
         })
     })
-    }else if (categoria){
+    }else if (cliente){
 
-        const sql = (`SELECT * FROM ${tabla} WHERE categoria = '${categoria}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por categoria", "${req.user}")`)
+        const sql = (`SELECT * FROM ${tabla} WHERE cliente = '${cliente}'`)
+        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por cliente", "${req.user}")`)
 
         db.query(sql, (err, results) => {
             if (err) {
@@ -54,7 +54,7 @@ const getOne = (req, res) => {
                 return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
                 }
                 if (results.length === 0) {
-                    return res.status(404).send(`La categoria '${categoria}' no existe`);
+                    return res.status(404).send(`El cliente '${cliente}' no existe`);
                     }
                     db.query(sql2)
                     return res.status(200).json({
@@ -62,10 +62,10 @@ const getOne = (req, res) => {
                     })
                 })
 
-        }else if(tipo){
+        }else if(nombre){
 
-            const sql = (`SELECT * FROM ${tabla} WHERE tipo = '${tipo}'`)
-            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por tipo", "${req.user}")`)
+            const sql = (`SELECT * FROM ${tabla} WHERE nombre = '${nombre}'`)
+            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por nombre", "${req.user}")`)
             
             db.query(sql, (err, results) => {
                 if (err) {
@@ -73,7 +73,7 @@ const getOne = (req, res) => {
                     return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
                     }
                     if (results.length === 0) {
-                        return res.status(404).send(`La categoria con tipo ${tipo} no existe`);
+                        return res.status(404).send(`El cliente ${nombre} no existe`);
                         }
                         db.query(sql2)
                         return res.status(200).json({
@@ -86,14 +86,14 @@ const getOne = (req, res) => {
 
 const create = (req, res) => {
 
-    const { categoria, tipo } = req.body;
+    const { cliente, nombre, apellido, email, telefono, direccion, localidad, provincia, dni, cuit, condicion, razonsocial, domiciliofiscal, localidadfiscal, provinciafiscal, codpostalfiscal, usuaeiomeli, pagweb, saldoinicial, observaciones } = req.body;
 
-    if(!categoria || !tipo){
+    if(!cliente || !nombre || !apellido || !email || !telefono || !direccion || !localidad || !provincia || !dni || !cuit){
         return res.status(400).send('Faltan campos por completar')
         }
      
-    const sql = (`INSERT INTO ${tabla} (categoria, tipo) VALUES ("${categoria}", "${tipo}")`)
-    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Crear Categoria", "${req.user}")`)
+    const sql = (`INSERT INTO ${tabla} (cliente, nombre, apellido, email, telefono, direccion, localidad, provincia, dni, cuit, condicion, razonsocial, domiciliofiscal, localidadfiscal, provinciafiscal, codpostalfiscal, usuaeiomeli, pagweb, saldoinicial, observaciones) VALUES ("${cliente}", "${nombre}", "${apellido}", "${email}", "${telefono}", "${direccion}", "${localidad}", "${provincia}", "${dni}", "${cuit}", "${condicion}", "${razonsocial}", "${domiciliofiscal}", "${localidadfiscal}", "${provinciafiscal}", "${codpostalfiscal}", "${usuaeiomeli}", "${pagweb}", "${saldoinicial}", "${observaciones}")`)
+    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Crear Cliente", "${req.user}")`)
     
     db.query(sql, (err, results) => {
         if (err) { 
@@ -109,17 +109,17 @@ const create = (req, res) => {
 
 
     const update = (req, res)=>{
-        const {id, categoria, tipo} = req.body;
+        const {cliente, nombre, apellido, email, telefono, direccion, localidad, provincia, dni, cuit, condicion, razonsocial, domiciliofiscal, localidadfiscal, provinciafiscal, codpostalfiscal, usuaeiomeli, pagweb, saldoinicial, observaciones} = req.body;
 
-        const sql = (`UPDATE ${tabla} SET categoria = '${categoria}', tipo = '${tipo}' WHERE id_categoria = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Actualizar Usuario", "${req.user}")`)
+        const sql = (`UPDATE ${tabla} SET cliente = '${cliente}', nombre= '${nombre}', apellido= '${apellido}', email= '${email}', telefono= '${telefono}', direccion= '${direccion}', localidad= '${localidad}', provincia= '${provincia}', dni= '${dni}', cuit= '${cuit}', condicion= '${condicion}', razonsocial= '${razonsocial}', domiciliofiscal= '${domiciliofiscal}', localidadfiscal= '${localidadfiscal}', provinciafiscal= '${provinciafiscal}', codpostalfiscal= '${codpostalfiscal}', usuaeiomeli= '${usuaeiomeli}', pagweb= '${pagweb}', saldoinicial= '${saldoinicial}', observaciones= '${observaciones}' WHERE id_cliente = '${id}'`)
+        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Actualizar Cliente", "${req.user}")`)
         
         db.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(`Error actualizando registro en tabla: ${tabla}`)
                 }
                 if (results.affectedRows === 0) {
-                    return res.status(404).send(`La categoria con id '${id}' no existe`)
+                    return res.status(404).send(`El cliente con id '${id}' no existe`)
                     }
                     db.query(sql2)
                     return res.status(200).json(results)
@@ -130,14 +130,14 @@ const create = (req, res) => {
  
         const {id} = req.body;
 
-        const sql = (`DELETE FROM ${tabla} WHERE id_categoria = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Eliminar Usuario", "${req.user}")`)
+        const sql = (`DELETE FROM ${tabla} WHERE id_cliente = '${id}'`)
+        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Eliminar Cliente", "${req.user}")`)
         db.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(`Error eliminando registro en tabla: ${tabla}`)
                 }
                 if (results.affectedRows === 0) {
-                    return res.status(404).send(`La categoria con id ${id} no existe`)
+                    return res.status(404).send(`El cliente con id ${id} no existe`)
                     }
                     db.query(sql2)
                     return res.status(200).json(results)
