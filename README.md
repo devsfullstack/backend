@@ -11,3 +11,11 @@ Instrucciones para la instalacion inicial del proyecto
 * El archivo arranque.bat se debe cortar y pegar dentro de la carpeta c:\poceanico, para que todo funcione como se debe.
 * Dentro de XAMMP se debe importar el archivo que esta en c:\poceanico\backend\db\db.sql , este archivo creara la base de datos y las tablas correnpondientes en xammp
 * Correr el archivo arranque.bat que se encuentra dentro de c:\poceanico\ , se debe iniciar el servidor en el puerto configurado en las variables de entorno y la conexion a la base de datos.
+
+Servidor
+
+El servidor se encuentra en la carpeta backend, se debe ejecutar el archivo arranque.bat
+
+Rutas
+
+

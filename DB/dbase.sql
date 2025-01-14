@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS `categorias`
   `id_categoria` int(11) AUTO_INCREMENT,
   `categoria` VARCHAR(20) NOT NULL,
   `tipo` varchar(20) NOT NULL,
-  `usuario` varchar(20),
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_categoria`)
@@ -53,14 +52,14 @@ CREATE TABLE IF NOT EXISTS `comisiones`
   PRIMARY KEY (`id_comisiones`)
 );
 
-CREATE TABLE IF NOT EXISTS `historico` 
+CREATE TABLE IF NOT EXISTS `registros` 
 (
-  `id_historico` int(11) AUTO_INCREMENT,
+  `id_registro` int(11) AUTO_INCREMENT,
   `modulo` VarChar(20) NOT NULL, 
   `accion` VarChar(20) NOT NULL,
   `usuario` varchar(20) not null,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id_historico`)
+	PRIMARY KEY (`id_registro`)
 );
 
 CREATE TABLE IF NOT EXISTS `presupuestos`
@@ -256,7 +255,17 @@ CREATE TABLE IF NOT EXISTS `productos`
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id_producto`)
-); 
+);
+
+CREATE TABLE IF NOT EXISTS `registros`
+(
+    `id_registro` int(11) AUTO_INCREMENT,
+    `modulo` VarChar(20) NOT NULL, 
+    `accion` VarChar(20) NOT NULL,
+    `usuario` varchar(20) NOT NULL,
+    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id_registro`)
+);
 
 /*Para crear la base de datos y crear las tablas en mysql debes importar este documento*/
 
