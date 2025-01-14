@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS `cuentas`
   `cuenta` varchar(50) NOT NULL,
   `tipo` varchar(50) NOT NULL,
   `saldo` float NOT NULL,
-  `usuario` varchar(20) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_cuenta`)
@@ -81,7 +80,6 @@ CREATE TABLE IF NOT EXISTS `presupuestos`
     `metodoenvio` varchar(30) NOT NULL, /* Enum: 'envio', 'recogida', 'otros' */
     `notacliente` varchar(30),  
     `notainterna` varchar(30),  
-    `usuario` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id_presupuesto`)
@@ -105,7 +103,6 @@ CREATE TABLE IF NOT EXISTS `ingresos`
     `cuenta` varchar(20) NOT NULL,
     `notacliente` varchar(30),  
     `notainterna` varchar(30),  
-    `usuario` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id_ingreso`)
@@ -157,22 +154,20 @@ CREATE TABLE IF NOT EXISTS `egresos`
 (
     `id_egreso` int(11) AUTO_INCREMENT,
     `tipo` VarChar(20) NOT NULL, /* Enum: 'compras', 'gastos', 'otros egresos' */
-    `id_proveedor` int(11) NOT NULL,
-    `id_categoria` int(11) NOT NULL,
+    `proveedor` int(11) NOT NULL,
+    `categoria` int(11) NOT NULL,
     `numero` VarChar(20) NOT NULL,
     `status` VarChar(20) NOT NULL, /* Enum: 'pendiente', 'pagado'*/
     `facturatipo` VarChar(20) NOT NULL, /* Enum: 'A', 'B', 'C', 'M', 'E' */
     `productos` VarChar(20) NOT NULL,
     `subtotal` float NOT NULL,  /*Suma de los productos */
     `descuento` float NOT NULL, /* Descuento del cliente */
-    `subtotalcondesc` float NOT NULL, /* Subtotal con descuento */
     `iva` float NOT NULL, /* IVA del subtotal */
     `total` float NOT NULL, /* Total con impuestos */
     `formapago` varchar(30), /* Enum: 'efectivo', 'tarjeta', 'cheque', 'transferencia', 'otros' */
     `cuenta` varchar(20) NOT NULL,
     `notacliente` varchar(30),  
     `notainterna` varchar(30),  
-    `usuario` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id_egreso`)
