@@ -1,21 +1,15 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const config = require('../config/config')
 
 
-const db = mysql.createConnection({
+// Crear una conexión a la base de datos
+const pool = mysql.createPool({
             host: config.mysql.host,
             user: config.mysql.user,
             password: config.mysql.password,
-            database: config.mysql.database
-        })
+            database: config.mysql.database,
+          });
 
-        db.connect(
-            function(err) { 
-                if (err) {
-                    console.error('Error de conexión en la base de datos:', err);
-                    return;
-                    }
-                    console.log('Base de datos conectada: '+config.mysql.database+' id ' + db.threadId);
-                    })
-
-module.exports = db;
+          console.log('Base de datos conectada: '+config.mysql.database);
+        
+module.exports = pool;

@@ -1,115 +1,69 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const db = require('../db/db'); // Asegúrate de que esta ruta sea correcta
+const pool = require('../db/db'); // Asegúrate de que esta ruta sea correcta
 const config = require('../config/config')
 
-const tabla = 'usuarios'
+const tabla = 'usuarios';
+
 // Función para registrar un nuevo usuario
-const register = (req, res) => {
-    const { nombre, apellido, usuario, contraseña, email, cargo, rol } = req.body; // Agregar rol
-
-    if(err) {
-        console.error('Error al registrar el usuario:', err.message);
-        return res.status(500).json({ error: 'Error al registrar el usuario.' });
-    }else{
-    // Verificar que todos los campos estén presentes
-    if (!nombre || !apellido || !usuario || !contraseña || !email || !cargo || !rol) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-    }else{
-        // Verificar si el usuario ya existe
-        const existingUserQuery = (`SELECT * FROM ${tabla} WHERE usuario = '${usuario}' OR email = '${email}'`);
-        db.query(existingUserQuery, (err, results)=>{
-            if (err) {
-                return res.status(500).json({ error: 'Error al verificar usuario.' });
-                }
-                else if (results.length > 0) {
-                    return res.status(400).json({ error: 'El usuario ya existe.' });
-                }else{
-                    // Hashear la contraseña
-                    const hashedPassword = bcrypt.hash(contraseña, 10);
-
-                    // Consultar la base de datos para registrar el nuevo usuario
-                    const insertQuery = (`INSERT INTO ${tabla} (nombre, apellido, usuario, contraseña, email, cargo, rol, fecha_ingreso) VALUES ("${nombre}", "${apellido}", "${usuario}", "${hashedPassword}", "${email}", "${cargo}", "${rol}");
-`);
-                    db.query(insertQuery, (err, results) => {
-                        if (err) {
-                            return res.status(500).json({ error: 'Error al registrar usuario.' });
-                            } else {
-                                return res.status(201).json({ message: 'Usuario registrado con éxito.',
-                                    results
-                                 });
-                                }
-                                });
-                }
-            })
-                    
-        }}
-        
-    }
-
+const register = async (req, res) => {
+  try {
+    const { nombre, email, password, rol, cargo } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const nuevoUsuario = { nombre, email, password: hashedPassword, rol, cargo };
+    
+    const result = await pool.query(`INSERT INTO ${tabla} SET ?`, nuevoUsuario);
+    res.json({ message: 'Usuario creado con éxito', id: result.insertId });
+  } catch (error) {
+    console.error('Error al crear usuario:', error.message);
+    res.status(500).json({ message: 'Error al crear usuario' });
+  }
+};
 
 // Función para iniciar sesión
-const login = (req, res) => {
-    const { usuario, contraseña } = req.body;
+const login = async (req, res) => {
+  try {
+    const { usuario, password } = req.body;
+    const [results] = await pool.query(`SELECT * FROM ${tabla} WHERE usuario = ?`, [usuario]);
 
-    if (!usuario || !contraseña) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-    }else{
-        const query = (`SELECT * FROM ${tabla} WHERE usuario = '${usuario}'`);
-        db.query(query, (err, results)=>{
-            if (err) {
-                console.error('Error al buscar el usuario:', err);
-                return res.status(500).json({ error: 'Error al buscar el usuario.' });
-            }else{
-                if (results.length === 0) {
-                    console.log('Datos incorrectos')
-                    console.log(`Usuario no encontrado: ${usuario}`);
-                    return res.status(401).json({ error: 'Credenciales incorrectas.' });
-                } else {    
-                    const isPasswordValid = bcrypt.compare(contraseña, usuario.contraseña);
-                    if (!isPasswordValid) {
-                        console.log(`Contraseña incorrecta para el usuario:, ${usuario}`);
-                        return res.status(401).json({ error: 'Credenciales incorrectas.' });
-                    }else{
-            
-                    // Generar un token JWT que incluya el rol
-                    const token = jwt.sign({ 
-                        id: usuario.id_user, 
-                        rol: usuario.rol 
-                    }, 
-                    config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN });
-                    res.status(200).json({ 
-                        message: 'Inicio de sesión exitoso.', 
-                        token 
-                    });
-                } 
-        
-}}})
-        }};
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const usuarioValido = results[0];
+    const isValid = await bcrypt.compare(password, usuarioValido.password);
+    if (!isValid) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    const token = jwt.sign({ id: usuarioValido.id, rol: usuarioValido.rol }, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN });
+    res.json({ token });
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error.message);
+    res.status(500).json({ message: 'Error al iniciar sesión' });
+  }
+};
 
 // Middleware para verificar el token
 const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization'];
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).json({ error: 'Se requiere un token.' });
+  }
 
-    if (!token) {
-        return res.status(403).json({ error: 'Se requiere un token.' });
+  jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token inválido.' });
     }
-
-    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ error: 'Token inválido.' });
-        }else{
-
-        req.id_user = decoded.id_user;
-        req.rol = decoded.rol; // Guarda el rol del usuario en la solicitud
-        next();
-        }
-    });
+    req.id_user = decoded.id;
+    req.rol = decoded.rol; // Guarda el rol del usuario en la solicitud
+    next();
+  });
 };
 
 // Exportar las funciones
 module.exports = {
-    register,
-    login,
-    verifyToken,
+  register,
+  login,
+  verifyToken,
 };

@@ -1,210 +1,88 @@
-const db = require('../db/db')
+const pool = require('../db/db')
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('../config/config')
 
 const tabla = 'usuarios'
 const tabla2 = 'registros'
 
-const getAll = (req, res) => {
-
-    const sql = (`SELECT * FROM ${tabla} ORDER BY created_at DESC`)
-    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar todo", "${req.user}")`)
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error(err.message);
-            return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-            }
-            db.query(sql2)
-            return res.status(200).json({
-                results
-            })
-            });
-            };
-
-
-const getOne = (req, res) => {
-    const {id, usuario, email, nombre, cargo, rol} = req.body
-    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar uno", "${req.user}")`)
-    
-    if(id > 0){
-        const sql = (`SELECT * FROM ${tabla} WHERE id_user = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por ID", "${req.user}")`)
-    
-        db.query(sql, (err, results) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                }
-                if (results.length === 0) {
-                    return res.status(404).send(`El usuario con id '${id}' no existe`);
-                    }
-                    db.query(sql2)
-                    return res.status(200).json({
-                        results
-    
-    
-        })
-    })
-    }else if (usuario){
-        const sql = (`SELECT * FROM ${tabla} WHERE usuario = '${usuario}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por usuario", "${req.user}")`)
-        db.query(sql, (err, results) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                }
-                if (results.length === 0) {
-                    return res.status(404).send(`El usuario '${usuario}' no existe`);
-                    }
-                    db.query(sql2)
-                    return res.status(200).json({
-                        results
-                    })
-                })
-
-        }else if(email){
-            const sql = (`SELECT * FROM ${tabla} WHERE email = '${email}'`)
-            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por email", "${req.user}")`)
-            
-            db.query(sql, (err, results) => {
-                if (err) {
-                    console.error(err.message);
-                    return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                    }
-                    if (results.length === 0) {
-                        return res.status(404).send(`El usuario con email ${email} no existe`);
-                        }
-                        db.query(sql2)
-                        return res.status(200).json({
-                            results
-                            })
-                            })
-        }else if(nombre){
-            const sql = (`SELECT * FROM ${tabla} WHERE nombre = '${nombre}'`)
-            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por nombre", "${req.user}")`)
-            db.query(sql, (err, results) => {
-                if (err) {
-                    console.error(err.message);
-                    return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                    }
-                    if (results.length === 0) {
-                        return res.status(404).send(`El usuario con nombre ${nombre} no existe`);
-                        }
-                        db.query(sql2)
-                        return res.status(200).json({
-                            results
-                            })
-                            })
-
-        }else if(cargo){
-            const sql = (`SELECT * FROM ${tabla} WHERE cargo = '${cargo}'`)
-            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por cargo", "${req.user}")`)
-            db.query(sql, (err, results) => {
-                if (err) {
-                    console.error(err.message);
-                    return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                    }
-                    if (results.length === 0) {
-                        return res.status(404).send(`El usuario con cargo ${cargo} no existe`);
-                        }
-                        db.query(sql2)
-                        return res.status(200).json({
-                            results
-                            })
-                            })
-        }else if(rol){
-            const sql = (`SELECT * FROM ${tabla} WHERE rol = '${rol}'`)
-            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por rol", "${req.user}")`)
-           
-            db.query(sql, (err, results) => {
-                if (err) {
-                    console.error(err.message);
-                    return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                    }
-                    if (results.length === 0) {
-                        return res.status(404).send(`El usuario con rol ${rol} no existe`);
-                        }
-                        db.query(sql2)
-                        return res.status(200).json({
-                            results
-                            })
-                            })
-                        }
-                    
-}
-
-
-const create = (req, res) => {
-
-    const { nombre, apellido, usuario, contraseña, email, cargo, rol } = req.body;
-
-    if(!nombre || !apellido || !usuario || !contraseña || !email || !cargo || !rol){
-        return res.status(400).send('Faltan campos por completar')
-        }
-    
-
-
-    const password2 = bcrypt.hashSync(contraseña, 10);
- 
-    const sql = (`INSERT INTO ${tabla} (nombre, apellido, usuario, contraseña, email, cargo, rol) VALUES ("${nombre}", "${apellido}", "${usuario}", "${password2}", "${email}", "${cargo}","${rol}")`)
-    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Crear Usuario", "${req.user}")`)
-    
-    db.query(sql, (err, results) => {
-        if (err) { 
-            return res.status(500).send(`Error creando registro en tabla: ${tabla}`) 
-        }else{
-        db.query(sql2)    
-        return res.status(200).json(results)
-        }
-    });
-
-}
-
-
-
-    const update = (req, res)=>{
-        const {id, nombre, apellido, usuario, contraseña, email, cargo, rol} = req.body;
-
-        const hashedPassword = bcrypt.hashSync(contraseña, 10);
-
-        const sql = (`UPDATE ${tabla} SET nombre = '${nombre}', apellido = '${apellido}', usuario = '${usuario}', contraseña = '${hashedPassword}', email = '${email}', cargo = '${cargo }', rol = '${rol}' WHERE id_user = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Actualizar Usuario", "${req.user}")`)
+const getAll = async (req, res) => {
+    try {
+        const usuario = await pool.query(`SELECT * FROM ${tabla} ORDER BY created_at DESC`);
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo) VALUES (?,?)`, ['Listar usuarios', tabla]);
+        return res.status(200).json(usuario[0]);
         
-        db.query(sql, (err, results) => {
-            if (err) {
-                return res.status(500).send(`Error actualizando registro en tabla: ${tabla}`)
-                }
-                if (results.affectedRows === 0) {
-                    return res.status(404).send(`El usuario con id '${id}' no existe`)
-                    }
-                    db.query(sql2)
-                    return res.status(200).json(results)
-                    })
-    }    
+        } catch (error) {
+        res.json({ error: error.message });
+        }
+        }
 
-    const deleted = (req,res) =>{
-        const {id} = req.body;
+const getById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const usuario = await pool.query(`SELECT * FROM ${tabla} WHERE id = $1`, [id]);
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) VALUES (?,?,?)`, ['Buscar usuario',tabla, req.user]); 
+        
 
-        const sql = (`DELETE FROM ${tabla} WHERE id_user = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Eliminar Usuario", "${req.user}")`)
-        db.query(sql, (err, results) => {
-            if (err) {
-                return res.status(500).send(`Error eliminando registro en tabla: ${tabla}`)
+        if (usuario.rows.length === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+        } else {
+            return res.status(200).json(usuario.rows[0]);
+            }
+            } catch (error) {
+                return res.status(500).json({ error: error.message });
                 }
-                if (results.affectedRows === 0) {
-                    return res.status(404).send(`El usuario con id ${id} no existe`)
+                }
+
+const create = async (req, res) => {
+    try {
+        const { nombre, apellido, usuario, contraseña, email, cargo, rol } = req.body;
+        const hashedPassword = await bcrypt.hash(contraseña, 10);
+        const datos = await pool.query(`INSERT INTO ${tabla} (nombre, apellido, usuario, contraseña, email, cargo, rol) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, [nombre, apellido, usuario, hashedPassword, email, cargo, rol]);
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) VALUES (?,?,?)`, ['Crear usuario',tabla, req.user]);
+
+        return res.status(200).json(datos.rows[0]);
+        } catch (error) {
+            res.json({ error: error.message });
+            }
+            }
+
+const update = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { nombre, email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const usuario = await pool.query(`UPDATE ${tabla} SET nombre = $1, email = $2, password = $3 WHERE id = $4 RETURNING *`, [nombre, email, hashedPassword, id]);
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) VALUES (?,?,?)`, ['Actualizar usuario',tabla, req.user]);
+        if (usuario.rows.length === 0) {
+            res.json({ error: 'Usuario no encontrado' });
+            } else {
+                res.json(usuario.rows[0]);
+                }
+                } catch (error) {
+                    res.json({ error: error.message });
                     }
-                    db.query(sql2)
-                    return res.status(200).json(results)
-                    })
-    }
-    
+                    }
+
+const deleted = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const usuario = await pool.query(`DELETE FROM ${tabla} WHERE id = $1`, [id] );
+        
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) VALUES (?,?,?)`, ['Eliminar usuario',tabla, req.user]);
+        if (usuario.rows.length === 0) {
+            res.json({ error: 'Usuario no encontrado' });
+            } else {
+                res.json({ message: 'Usuario eliminado' });
+                }
+                } catch (error) {
+                    res.json({ error: error.message });
+                    }
+                    }
+
+
 module.exports = {
-    getOne,
     getAll,
+    getById,
     create,
     update,
     deleted
-}
+    };

@@ -1,152 +1,73 @@
-const db = require('../db/db')
+const pool = require('../db/db');
 
 const tabla = 'ingresos'
 const tabla2 = 'registros'
 
-const getAll = (req, res) => {
-
-    const sql = (`SELECT * FROM ${tabla} ORDER BY created_at DESC`)
-    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar todo", "${req.user}")`)
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error(err.message);
-            return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
+const getAll = async (req, res) => {
+    try {
+        const ingreso = await pool.query(`SELECT * FROM ${tabla} ORDER BY created_at DESC`)   
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo) VALUES (?,?)`, ['Mostrar todo', tabla])    
+        return res.status(200).json(ingreso[0])
+        } catch (error) {
+            console.log(error)
             }
-            db.query(sql2)
-            return res.status(200).json({
-                results
-            })
-            });
-            };
+            }
 
-
-const getOne = (req, res) => {
-    const {id, categoria, tipo} = req.body
-    
-    if(id > 0){
-        const sql = (`SELECT * FROM ${tabla} WHERE id_categoria = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por ID", "${req.user}")`)
-    
-        db.query(sql, (err, results) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                }
-                if (results.length === 0) {
-                    return res.status(404).send(`Categoria con id '${id}' no existe`);
-                    }
-                    db.query(sql2)
-                    return res.status(200).json({
-                        results
-    
-    
-        })
-    })
-    }else if (categoria){
-
-        const sql = (`SELECT * FROM ${tabla} WHERE categoria = '${categoria}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por categoria", "${req.user}")`)
-
-        db.query(sql, (err, results) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                }
-                if (results.length === 0) {
-                    return res.status(404).send(`La categoria '${categoria}' no existe`);
-                    }
-                    db.query(sql2)
-                    return res.status(200).json({
-                        results
-                    })
-                })
-
-        }else if(tipo){
-
-            const sql = (`SELECT * FROM ${tabla} WHERE tipo = '${tipo}'`)
-            const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Mostrar por tipo", "${req.user}")`)
-            
-            db.query(sql, (err, results) => {
-                if (err) {
-                    console.error(err.message);
-                    return res.status(500).send(`Error al consultar la tabla: ${tabla}`);
-                    }
-                    if (results.length === 0) {
-                        return res.status(404).send(`La categoria con tipo ${tipo} no existe`);
-                        }
-                        db.query(sql2)
-                        return res.status(200).json({
-                            results
-                            })
-                            })
-                    
-}}
-
-
-const create = (req, res) => {
-
-    const { categoria, tipo } = req.body;
-
-    if(!categoria || !tipo){
-        return res.status(400).send('Faltan campos por completar')
+const getById = async (req, res) => {
+    try {
+        const id = req.params.id
+        const result = await pool.query(`SELECT * FROM ${tabla} WHERE id = ${id} `, [id])   
+        await pool.query(`INSERT INTO ${tabla2} (accion, tabla, usuario) VALUES (?,?,?)`, ['Mostrar por ID', tabla, req.user])  
+        res.json(result.rows)
         }
-     
-    const sql = (`INSERT INTO ${tabla} (categoria, tipo) VALUES ("${categoria}", "${tipo}")`)
-    const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Crear Categoria", "${req.user}")`)
-    
-    db.query(sql, (err, results) => {
-        if (err) { 
-            return res.status(500).send(`Error creando registro en tabla: ${tabla}`) 
-        }else{
-        db.query(sql2)    
-        return res.status(200).json(results)
+        catch (error) {
+            console.log(error)
+            }
+            }
+
+const create = async (req, res) => {
+    try {
+        const {cliente_id, status, facturatipo, categoria_id, productos, subtotal, descuento, subtotalcondesc, iva, total, formapago, metodoenvio, cuenta_id, notacliente, notainterna} = req.body  
+        const result = await pool.query(`INSERT INTO ${tabla} (cliente_id, status, facturatipo, categoria_id, productos, subtotal, descuento, subtotalcondesc, iva, total, formapago, metodoenvio, cuenta_id, notacliente, notainterna) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`, [cliente_id, status, facturatipo, categoria_id, productos, subtotal, descuento, subtotalcondesc, iva, total, formapago, metodoenvio, cuenta_id, notacliente, notainterna])  
+        await pool.query(`INSERT INTO ${tabla2} (accion, tabla, usuario) VALUES (?,?,?)`, ['Crear', tabla, req.user])   
+        res.json(result.rows[0])
+        }   
+        catch (error) {
+            console.log(error)
+            }
+            }
+
+const update = async (req, res) => {
+    try {
+        const id = req.params.id
+        const {cliente_id, status, facturatipo, categoria_id, productos, subtotal, descuento, subtotalcondesc, iva, total, formapago, metodoenvio, cuenta_id, notacliente, notainterna} = req.body  
+        const result = await pool.query(`UPDATE ${tabla} SET cliente_id = $1, status = $2, facturatipo = $3, categoria_id = $4, productos = $5, subtotal = $6, descuento = $7, subtotalcondesc = $8, iva = $9, total = $10, formapago = $11, metodoenvio = $12, cuenta_id = $13, notacliente = $14, notainterna = $15 WHERE id = ${id} RETURNING *`, [cliente_id, status, facturatipo, categoria_id, productos, subtotal, descuento, subtotalcondesc, iva, total, formapago, metodoenvio, cuenta_id, notacliente, notainterna]) 
+        await pool.query(`INSERT INTO ${tabla2} (accion, tabla, usuario) VALUES (?,?,?)`, ['Actualizar', tabla, req.user])  
+        res.json(result.rows[0])
         }
-    });
+        catch (error) {
+            console.log(error)  
+            }
+        }
 
-}
+const deleted = async (req, res) => {
+    try {
+        const id = req.params.id
+        const   result = await pool.query(`DELETE FROM ${tabla} WHERE id = $1`, [id])   
+        await pool.query(`INSERT INTO ${tabla2} (accion, tabla, usuario) VALUES (   ?,?,?)`, ['Eliminar', tabla, req.user]) 
+        res.json({message: 'Registro eliminado con éxito.'})
+        }
+        catch (error) {
+            console.log(error)
+            }
+        }
 
 
 
-    const update = (req, res)=>{
-        const {id, categoria, tipo} = req.body;
-
-        const sql = (`UPDATE ${tabla} SET categoria = '${categoria}', tipo = '${tipo}' WHERE id_categoria = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Actualizar Usuario", "${req.user}")`)
-        
-        db.query(sql, (err, results) => {
-            if (err) {
-                return res.status(500).send(`Error actualizando registro en tabla: ${tabla}`)
-                }
-                if (results.affectedRows === 0) {
-                    return res.status(404).send(`La categoria con id '${id}' no existe`)
-                    }
-                    db.query(sql2)
-                    return res.status(200).json(results)
-                    })
-    }    
-
-    const deleted = (req,res) =>{
- 
-        const {id} = req.body;
-
-        const sql = (`DELETE FROM ${tabla} WHERE id_categoria = '${id}'`)
-        const sql2 = (`INSERT INTO ${tabla2} (modulo, accion, usuario) VALUES ("${tabla}", "Eliminar Usuario", "${req.user}")`)
-        db.query(sql, (err, results) => {
-            if (err) {
-                return res.status(500).send(`Error eliminando registro en tabla: ${tabla}`)
-                }
-                if (results.affectedRows === 0) {
-                    return res.status(404).send(`La categoria con id ${id} no existe`)
-                    }
-                    db.query(sql2)
-                    return res.status(200).json(results)
-                    })
-    }
     
 module.exports = {
-    getOne,
     getAll,
+    getById,
     create,
     update,
     deleted

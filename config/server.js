@@ -28,6 +28,7 @@ app.use('/api', require('../routes/presupuestos'))
 app.use('/api', require('../routes/productos'))
 app.use('/api', require('../routes/proveedores'))
 app.use('/api', require('../routes/facturas'))
+app.use('/api', require('../routes/estadisticas'))
 
 
 // Middleware para manejo de errores

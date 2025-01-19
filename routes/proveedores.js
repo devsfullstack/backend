@@ -4,7 +4,7 @@ const controllers = require('../controllers/proveedores')
 const path = require('path')
 
 router.get('/proveedores', controllers.getAll)
-router.get('/proveedor', controllers.getOne)
+router.get('/proveedor', controllers.getById)
 router.post('/proveedore', controllers.create)
 router.put('/proveedore', controllers.update)
 router.delete('/proveedore', controllers.deleted)

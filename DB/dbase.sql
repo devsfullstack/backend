@@ -5,7 +5,7 @@ USE poceanico;
 CREATE TABLE IF NOT EXISTS `usuarios` 
 (
 
-  `id_user` int(11) AUTO_INCREMENT,
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
   `nombre` VARCHAR(255) NOT NULL,
   `apellido` VARCHAR(255) NOT NULL,
   `usuario` VARCHAR(255) NOT NULL,
@@ -14,66 +14,61 @@ CREATE TABLE IF NOT EXISTS `usuarios`
   `cargo` VARCHAR(255) NOT NULL,
   `rol` VARCHAR(255) NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_user`)
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS `categorias`
 (
-  `id_categoria` int(11) AUTO_INCREMENT,
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
   `categoria` VARCHAR(20) NOT NULL,
   `tipo` varchar(20) NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_categoria`)
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 
 CREATE TABLE IF NOT EXISTS `cuentas`
 (
-  `id_cuenta` int(11) AUTO_INCREMENT,
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
   `cuenta` varchar(50) NOT NULL,
   `tipo` varchar(50) NOT NULL,
   `saldo` float NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_cuenta`)
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ); 
 
 CREATE TABLE IF NOT EXISTS `comisiones` 
 (
-  `id_comisiones` int(11) AUTO_INCREMENT,
-  `usuario` varchar(20) NOT NULL,
+  `id` int(11) AUTO_INCREMENT,
+  `usuario_id` varchar(20) NOT NULL,
   `status` VarChar(20) NOT NULL,
   `monto` float NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_comisiones`)
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS `registros` 
 (
-  `id_registro` int(11) AUTO_INCREMENT,
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
   `modulo` VarChar(20) NOT NULL, 
   `accion` VarChar(20) NOT NULL,
   `usuario` varchar(20) not null,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id_registro`)
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS `presupuestos`
 (
-    `id_presupuesto` int(11) AUTO_INCREMENT,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `numero` VarChar(20) NOT NULL,
     `estado` VarChar(20) NOT NULL, /* Enum: 'pendiente', 'aceptado', 'rechazado', 'cobrado'*/
     `emision` timestamp NOT NULL,
     `vencimiento` timestamp NOT NULL,
-    `cliente` varchar(20) NOT NULL,
-    `categoria`  varchar(20) NOT NULL,
-    `productos` VarChar(20) NOT NULL,
+    `cliente_id` varchar(20) NOT NULL,
+    `categoria_id`  varchar(20) NOT NULL,
+    `productos_id` VarChar(20) NOT NULL,
     `subtotal` float NOT NULL,  /*Suma de los productos */
     `descuento` float NOT NULL, /* Descuento del cliente */
-    `subtotalcondesc` float NOT NULL, /* Subtotal con descuento */
     `iva` float NOT NULL, /* IVA del subtotal */
     `total` float NOT NULL, /* Total con impuestos */
     `formapago` varchar(30) NOT NULL, /* Enum: 'efectivo', 'tarjeta', 'cheque', 'transferencia', 'otros' */
@@ -82,16 +77,18 @@ CREATE TABLE IF NOT EXISTS `presupuestos`
     `notainterna` varchar(30),  
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_presupuesto`)
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id),
+    FOREIGN KEY (productos_id) REFERENCES productos(id)    
 );
 
 CREATE TABLE IF NOT EXISTS `ingresos`
 (
-    `id_ingreso` int(11) AUTO_INCREMENT,
-    `cliente` varchar(20) NOT NULL,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
+    `cliente_id` varchar(20) NOT NULL,
     `status` VarChar(20) NOT NULL, /* Enum: 'pendiente', 'aceptado', 'rechazado', 'cobrado', '', */
     `facturatipo` VarChar(20) NOT NULL, /* Enum: 'A', 'B', 'C', 'M', 'E' */
-    `categoria`  varchar(20) NOT NULL,
+    `categoria_id`  varchar(20) NOT NULL,
     `productos` VarChar(20) NOT NULL,
     `subtotal` float NOT NULL,  /*Suma de los productos */
     `descuento` float NOT NULL, /* Descuento del cliente */
@@ -100,23 +97,25 @@ CREATE TABLE IF NOT EXISTS `ingresos`
     `total` float NOT NULL, /* Total con impuestos */
     `formapago` varchar(30) NOT NULL, /* Enum: 'efectivo', 'tarjeta', 'cheque', 'transferencia', 'otros' */
     `metodoenvio` varchar(30) NOT NULL, /* Enum: 'envio', 'recogida', 'otros' */
-    `cuenta` varchar(20) NOT NULL,
+    `cuenta_id` varchar(20) NOT NULL,
     `notacliente` varchar(30),  
     `notainterna` varchar(30),  
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_ingreso`)
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id),
+    FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
 );
 
 CREATE TABLE IF NOT EXISTS `ventas`
 (
-    `id_venta` int(11) AUTO_INCREMENT,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `tipo` VarChar(20) NOT NULL, /* Enum: 'presupuesto', 'remito', 'factura' */
     `numero` VarChar(20) NOT NULL,
-    `cliente` varchar(20) NOT NULL,
+    `cliente_id` varchar(20) NOT NULL,
     `status` VarChar(20) NOT NULL, /* Enum: 'pendiente', 'aceptado', 'rechazado', 'cobrado', '', */
     `facturatipo` VarChar(20) NOT NULL, /* Enum: 'A', 'B', 'C', 'M', 'E' */
-    `categoria`  varchar(20) NOT NULL,
+    `categoria_id`  varchar(20) NOT NULL,
     `productos` VarChar(20) NOT NULL,
     `subtotal` float NOT NULL,  /*Suma de los productos */
     `descuento` float NOT NULL, /* Descuento del cliente */
@@ -126,18 +125,20 @@ CREATE TABLE IF NOT EXISTS `ventas`
     `formapago` varchar(30) NOT NULL, /* Enum: 'efectivo', 'tarjeta', 'cheque', 'cuenta', 'otros' */
     `plazo` varchar(30) NOT NULL, /* Enum: 'contado', '30 dias', '60 dias', '90 dias', 'otros' */
     `metodoenvio` varchar(30) NOT NULL, /* Enum: 'domicilio', 'local', 'otros' */
-    `cuenta` varchar(20) NOT NULL,  
-    `usuario` varchar(20) NOT NULL,
+    `cuenta_id` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_venta`)
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id),
+    FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
+
 );
 
 CREATE TABLE IF NOT EXISTS `detalleventa`
 (
-    `id_detalleventa` int(11) AUTO_INCREMENT,
-    `id_venta` int(11) NOT NULL,
-    `id_producto` int(11) NOT NULL,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
+    `venta_id` int(11) NOT NULL,
+    `productos` int(11) NOT NULL,
     `cantidad` int(11) NOT NULL,
     `precio` float NOT NULL,
     `descuento` float NOT NULL,
@@ -146,16 +147,16 @@ CREATE TABLE IF NOT EXISTS `detalleventa`
     `total` float NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_detalleventa`)
+    FOREIGN KEY (venta_id) REFERENCES ventas(id)
 );
 
 
 CREATE TABLE IF NOT EXISTS `egresos`
 (
-    `id_egreso` int(11) AUTO_INCREMENT,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `tipo` VarChar(20) NOT NULL, /* Enum: 'compras', 'gastos', 'otros egresos' */
-    `proveedor` int(11) NOT NULL,
-    `categoria` int(11) NOT NULL,
+    `proveedor_id` int(11) NOT NULL,
+    `categoria_id` int(11) NOT NULL,
     `numero` VarChar(20) NOT NULL,
     `status` VarChar(20) NOT NULL, /* Enum: 'pendiente', 'pagado'*/
     `facturatipo` VarChar(20) NOT NULL, /* Enum: 'A', 'B', 'C', 'M', 'E' */
@@ -165,17 +166,20 @@ CREATE TABLE IF NOT EXISTS `egresos`
     `iva` float NOT NULL, /* IVA del subtotal */
     `total` float NOT NULL, /* Total con impuestos */
     `formapago` varchar(30), /* Enum: 'efectivo', 'tarjeta', 'cheque', 'transferencia', 'otros' */
-    `cuenta` varchar(20) NOT NULL,
+    `cuenta_id` varchar(20) NOT NULL,
     `notacliente` varchar(30),  
     `notainterna` varchar(30),  
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_egreso`)
+    FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id),
+    FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
+
 );
 
 CREATE TABLE IF NOT EXISTS  `clientes`
 (
-    `id_cliente` int(11) AUTO_INCREMENT,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `cliente` VarChar(20) NOT NULL, /* Enum: 'DNI ', 'Cuit', 'Cuil' */
     `nombre` VarChar(20) NOT NULL, /* DNI, CUIT, CUil */
     `apellido` VarChar(20) NOT NULL,
@@ -197,13 +201,12 @@ CREATE TABLE IF NOT EXISTS  `clientes`
     `saldoinicial` float NOT NULL, /* Saldo inicial del proveedor */
     `observaciones` VarChar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_cliente`)
+    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
 CREATE TABLE IF NOT EXISTS  `proveedores`
 (
-    `id_proveedor` int(11) AUTO_INCREMENT,
-    `proveedor` VarChar(20) NOT NULL, /* Enum: 'DNI ', 'Cuit', 'Cuil' */
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `nombre` VarChar(20) NOT NULL, /* DNI, CUIT, CUil */
     `apellido` VarChar(20) NOT NULL,
     `email` VarChar(20) NOT NULL,
@@ -225,17 +228,17 @@ CREATE TABLE IF NOT EXISTS  `proveedores`
     `observaciones` VarChar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_proveedor`)
+    FOREIGN KEY (proveedor_id) REFERENCES proveedores(id)
 );
 
 CREATE TABLE IF NOT EXISTS `productos`
 (
-    `id_producto` int(11) AUTO_INCREMENT,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `codigo` VarChar(20) NOT NULL,
     `nombre` VarChar(20) NOT NULL,
     `tipo` VarChar(20) NOT NULL,
     `tipo2` VarChar(20) NOT NULL, /* Enum: 'Servicio', 'Producto' */
-    `proveedor` varchar(20) NOT NULL, /* Id del proveedor */
+    `proveedor_id` varchar(20) NOT NULL, /* Id del proveedor */
     `deposito` varchar(20) NOT NULL,
     `general` int(11) NOT NULL, 
     `stock` varchar(20) NOT NULL,
@@ -249,18 +252,37 @@ CREATE TABLE IF NOT EXISTS `productos`
     `imagen` varchar(50) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_producto`)
+    FOREIGN KEY (proveedor_id) REFERENCES proveedores(id)
 );
 
 CREATE TABLE IF NOT EXISTS `registros`
 (
-    `id_registro` int(11) AUTO_INCREMENT,
+    `id` int(11) AUTO_INCREMENT PRIMARY KEY,
     `modulo` VarChar(20) NOT NULL, 
     `accion` VarChar(20) NOT NULL,
-    `usuario` varchar(20) NOT NULL,
+    `usuario_id` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_registro`)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
+
+CREATE TABLE IF NOT EXISTS `facturas`
+(
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
+  `tipo` VarChar(20) NOT NULL, /* Enum: 'A', 'B', 'C', 'M', 'E' */
+  `numero` VarChar(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `cliente_id` varchar(20) NOT NULL,
+  `productos` text NOT NULL,
+  `subtotal` float NOT NULL,
+  `iva` float NOT NULL,
+  `total` float NOT NULL,
+  `estado` VarChar(20) NOT NULL, /* Enum: 'Pendiente','Pagada','Anulada' */
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+
+  );
+
 
 /*Para crear la base de datos y crear las tablas en mysql debes importar este documento*/
 
