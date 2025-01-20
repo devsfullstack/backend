@@ -11,13 +11,13 @@ const register = async (req, res) => {
   try {
     const { usuario, nombre, email, contraseña, rol, cargo } = req.body;
     const hashedPassword = await bcrypt.hash(contraseña, 10);
-    const nuevoUsuario = { usuario, nombre, email, contraseña: hashedPassword, rol, cargo };
     
 
-    const result = await pool.query(`INSERT INTO ${tabla} SET ?`, [nuevoUsuario]);
-    await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) values(?,?,?)`, ["Crear", tabla, usuario]);
+    const result = await pool.query(`INSERT INTO ${tabla} (usuario, nombre, email, contraseña, rol, cargo) values (?,?,?,?,?,?)`, [usuario, nombre, email, hashedPassword, rol, cargo]);
+    await pool.query(`INSERT INTO ${tabla2} (accion, modulo) values(?,?)`, ["Crear", tabla]);
     res.json({ 
-      message: 'Usuario creado con éxito'
+      message: 'Usuario creado con éxito',
+      data: result
     });
   } catch (error) {
     console.error('Error al crear usuario:', error.message);
@@ -90,26 +90,25 @@ const verifyToken = (req, res, next) => {
 
 const getAll = async (req, res) => {
     try {
-        const usuario = await pool.query(`SELECT * FROM ${tabla} ORDER BY created_at DESC`);
-        await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) VALUES (?,?,?)`, ['Listar todo', tabla, req.usuario]);
-        return res.status(200).json(usuario[0]);
-        
+        const resultado = await pool.query(`SELECT * FROM ${tabla} ORDER BY created_at DESC`);
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo) VALUES (?,?)`, ['Listar todo', tabla]);
+        return res.status(200).json(resultado[0]);
         } catch (error) {
         res.json({ error: error.message });
-        }
+    }
         }
 
 const getById = async (req, res) => {
     try {
         const id = req.params.id;
-        const usuario = await pool.query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
-        await pool.query(`INSERT INTO ${tabla2} (accion, modulo, usuario) VALUES (?,?,?)`, ['Buscar usuario',tabla, req.usuario]); 
+        const resultado = await pool.query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
+        await pool.query(`INSERT INTO ${tabla2} (accion, modulo) VALUES (?,?)`, ['Buscar usuario',tabla]); 
         
 
-        if (usuario.rows.length === 0) {
+        if (resultado.length === 0) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
         } else {
-            return res.status(200).json(usuario.rows[0]);
+            return res.status(200).json(resultado[0]);
             }
             } catch (error) {
                 return res.status(500).json({ error: error.message });

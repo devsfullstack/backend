@@ -4,7 +4,6 @@ const controllers = require('../controllers/auth'); // Asegúrate de que la ruta
 
 // Ruta para registrar un nuevo usuario
 router.post('/register', controllers.register); // Usa 'register' directamente
-
 router.get('/users', controllers.getAll)
 router.get('/user', controllers.getById)
 router.put('/user', controllers.update)
